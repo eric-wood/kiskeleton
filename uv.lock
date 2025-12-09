@@ -1,0 +1,23 @@
+version = 1
+revision = 3
+requires-python = ">=3.13"
+
+[[package]]
+name = "kicad-symbol-templater"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "kiutils" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "kiutils", specifier = ">=1.4.8" }]
+
+[[package]]
+name = "kiutils"
+version = "1.4.8"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/db/07/04d7a636eaf9f54f6e7cdfc2117843ef4cc6a6360a9866fbd76bc2a0d0dd/kiutils-1.4.8.tar.gz", hash = "sha256:18c5803283e579cfe8772955e7702548d7139e0fc630daa579ed6b2b767db846", size = 84024, upload-time = "2024-02-02T23:38:00.283Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8c/c0/381ece43b464ce8aff02a327b0d5cdc011b8c0d9a652e245b05e0bb0810a/kiutils-1.4.8-py3-none-any.whl", hash = "sha256:ca7c5c7eafb7bc33daa3d6cfe42cc704be2bcd2206103b28ad2682d88a6072ae", size = 93827, upload-time = "2024-02-02T23:37:58.443Z" },
+]
