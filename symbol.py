@@ -19,5 +19,9 @@ class Symbol:
     def set_name(self, name: str):
         self.symbol.entryName = name
 
+        # units are symbols within the symbol, and their prefix has to match the parent name
+        for unit in self.symbol.units:
+            unit.entryName = unit.entryName.replace(unit.entryName, name)
+
     def name(self):
         self.symbol.entryName
