@@ -1,8 +1,9 @@
-from kiutils.symbol import SymbolLib, Symbol as KiSymbol
-from symbol import Symbol
 import csv
+from copy import deepcopy
+from src.symbol import Symbol
+from src.library import Library
 
-symbol_cache: dict[str, KiSymbol] = dict()
+symbol_cache: dict[str, Symbol] = dict()
 
 
 class Spreadsheet:
@@ -20,7 +21,15 @@ class Spreadsheet:
             writer = csv.DictWriter(file, fieldnames=field_names)
             writer.writeheader()
             for symbol in self.symbols:
-                writer.writerow({"name": symbol.name(), **symbol.properties})
+                properties = {}
+                for prop in symbol.properties:
+                    properties[prop] = symbol.properties[prop].value
+                template = {
+                    "template_library": symbol.template_library,
+                    "template_symbol_name": symbol.template_name,
+                }
+
+                writer.writerow({"name": symbol.name, **properties, **template})
 
     def read(self, path: str):
         with open(path, "r") as file:
@@ -38,41 +47,51 @@ class Spreadsheet:
                 template_symbol = get_symbol(
                     template_symbol_library, template_symbol_name
                 )
-                symbol = Symbol(template_symbol)
+                if template_symbol is None:
+                    continue
+
+                symbol = deepcopy(template_symbol)
                 symbol.set_name(name)
                 symbol.merge_properties(row)
                 self.symbols.append(symbol)
 
     def write_symbols(self, path: str):
-        library = SymbolLib(filePath=path)
-        library.symbols = [s.symbol for s in self.symbols]
-        library.to_file()
+        library = Library.new()
+        library.symbols = self.symbols
+        library.to_file(path)
 
     def add_defaults(self, template_library=None, template_symbol_name=None):
         if template_library is None or template_symbol_name is None:
             return
 
-        template_symbol = get_symbol(template_library, template_symbol_name)
-        symbol = Symbol(template_symbol)
-        symbol.set_name(template_symbol.entryName)
-        self.symbols.append(symbol)
+        template_symbol = deepcopy(get_symbol(template_library, template_symbol_name))
+        if template_symbol is None:
+            return
+
+        template_symbol.template_library = template_library
+        template_symbol.template_name = template_symbol_name
+        self.symbols.append(template_symbol)
 
 
-def get_symbol(library_path: str, symbol_name: str) -> KiSymbol:
+def get_symbol(library_path: str, symbol_name: str) -> Symbol | None:
     cache_key = "{}-{}".format(library_path, symbol_name)
     if cache_key in symbol_cache:
         return symbol_cache[cache_key]
 
     symbol = retrieve_symbol(library_path, symbol_name)
+    if symbol is None:
+        return
+
     symbol_cache[symbol_name] = symbol
 
     return symbol
 
 
-def retrieve_symbol(library_path: str, symbol_name: str) -> KiSymbol:
-    library = SymbolLib.from_file(library_path)
+def retrieve_symbol(library_path: str, symbol_name: str) -> Symbol | None:
+    library = Library.from_file(library_path)
+
     for symbol in library.symbols:
-        if symbol.entryName == symbol_name:
+        if symbol.name == symbol_name:
             return symbol
 
     print(

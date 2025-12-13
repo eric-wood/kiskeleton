@@ -7,13 +7,17 @@ name = "kicad-symbol-templater"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "kiutils" },
+    { name = "sexpdata" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "kiutils", git = "https://github.com/makerhub/kiutils?branch=samkristoff%2Fdev" }]
+requires-dist = [{ name = "sexpdata", specifier = ">=1.0.2" }]
 
 [[package]]
-name = "kiutils"
-version = "1.4.8"
-source = { git = "https://github.com/makerhub/kiutils?branch=samkristoff%2Fdev#b844b926968579e9ca274dc4e186456a3af340c1" }
+name = "sexpdata"
+version = "1.0.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a7/7f/369a478863a39351be75e0a12602bc29196b31f87bf3432bed2be6379f8e/sexpdata-1.0.2.tar.gz", hash = "sha256:92b67b0361f6766f8f9e44b9519cf3fbcfafa755db85bbf893c3e1cf4ddac109", size = 8906, upload-time = "2024-01-09T07:09:59.096Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f1/f3/ec9f8cc20dc1f34c926f0ec3f43b73fa2da59cf08e432fb8ae5b666b2027/sexpdata-1.0.2-py3-none-any.whl", hash = "sha256:b39c918f055a85c5c35c1d4f7930aabb176bd29016e5ba5692e7e849914b2a1a", size = 10337, upload-time = "2024-01-09T07:09:57.185Z" },
+]

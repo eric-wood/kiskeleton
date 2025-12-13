@@ -1,2 +1,0 @@
-name,template_library,template_symbol_name,Reference,Value,Footprint,Datasheet,Description,ki_keywords,ki_fp_filters,LCSC
-foo,/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/Device.kicad_sym,R,R,R,,~,Resistor,R res resistor,R_*,1234

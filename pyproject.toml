@@ -4,9 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = [
-    "kiutils>=1.4.8",
-]
+dependencies = ["sexpdata>=1.0.2"]
 
 [tool.uv.sources]
 kiutils = { git = "https://github.com/makerhub/kiutils", branch = "samkristoff/dev" }
