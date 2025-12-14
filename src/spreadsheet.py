@@ -4,6 +4,7 @@ from copy import deepcopy
 from src.symbol import Symbol
 from src.library import Library
 import os.path
+from typing import Self
 
 symbol_cache: dict[str, Symbol] = dict()
 
@@ -60,6 +61,17 @@ class Spreadsheet:
                 symbol.set_name(name)
                 symbol.merge_properties(row)
                 self.symbols.append(symbol)
+
+    @classmethod
+    def from_library(cls, library_path: str) -> Self:
+        library = Library.from_file(library_path)
+        spreadsheet = cls()
+        spreadsheet.symbols = library.symbols
+        for symbol in spreadsheet.symbols:
+            symbol.template_library = library_path
+            symbol.template_name = symbol.name
+
+        return spreadsheet
 
     def write_symbols(self, path: str):
         library = Library.new()

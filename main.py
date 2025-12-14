@@ -7,6 +7,8 @@ def new(library_path, symbol_name, output_path):
     spreadsheet = Spreadsheet()
     if library_path and symbol_name:
         spreadsheet.add_defaults(library_path, symbol_name)
+    elif library_path and symbol_name is None:
+        spreadsheet = Spreadsheet.from_library(library_path)
 
     spreadsheet.write(output_path)
 
@@ -26,17 +28,17 @@ def main():
     subparsers = parser.add_subparsers(help="commands:", dest="command")
 
     new_parser = subparsers.add_parser(
-        "new", help="Create a new spreadsheet from a KiCad symbol"
+        "new", help="Create a new spreadsheet from a KiCad library or symbol"
     )
     new_parser.add_argument(
         "-l",
         "--library",
-        help="Symbol library to extract template symbol from",
+        help="Symbol library to convert to spreadsheet",
     )
     new_parser.add_argument(
         "-s",
         "--symbol",
-        help="Name of symbol to extract from provided library for templating",
+        help="Name of symbol to extract from provided library; if omitted the entire library will be used",
     )
     new_parser.add_argument(
         "-o", "--output", required=True, help="File to output spreadsheet to"

@@ -1,3 +1,5 @@
+import os.path
+import logging
 from typing import Self
 from dataclasses import dataclass, field
 from src.symbol import Symbol
@@ -35,6 +37,9 @@ class Library:
 
     @classmethod
     def from_file(cls, path: str) -> Self:
+        if not os.path.isfile(path):
+            logging.error("library not found %s", path)
+
         with open(path) as file:
             return cls.from_str(file.read())
 
