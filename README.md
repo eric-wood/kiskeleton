@@ -23,13 +23,25 @@ creating every single part from scratch; after all, they're all the same base re
 
 This project uses [uv](https://docs.astral.sh/uv/) to manage stuff.
 
-Install it and then do:
+You can run it directly without installing with `uvx`:
 
 ```sh
-uv run main.py
+uvx kiskeleton
 ```
 
-...and it should all work.
+### Manual install
+
+Clone this repo somewhere, then do:
+
+```sh
+uv tool install -e PATH_TO_CLONED_REPO
+```
+
+Now you can run it from wherever:
+
+```sh
+uv run kiskeleton
+```
 
 ## Usage
 

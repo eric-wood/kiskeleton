@@ -21,8 +21,8 @@ def generate(spreadsheet_path, output_path):
 
 def main():
     parser = ArgumentParser(
-        prog="kicad-symbol-templater",
-        description="Derive KiCad symbol library from a common template",
+        prog="kiskeleton",
+        description="Derive and modify KiCad symbol libraries with spreadsheets",
     )
 
     subparsers = parser.add_subparsers(help="commands:", dest="command")

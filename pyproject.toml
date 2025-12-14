@@ -1,10 +1,14 @@
 [project]
-name = "kicad-symbol-templater"
+name = "kiskeleton"
 version = "0.1.0"
-description = "Add your description here"
+description = "Derive and modify KiCad symbol libraries with spreadsheets"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = ["sexpdata>=1.0.2"]
 
-[tool.uv.sources]
-kiutils = { git = "https://github.com/makerhub/kiutils", branch = "samkristoff/dev" }
+[tool.setuptools.packages.find]
+where = ["./"]
+include = ["src"]
+
+[project.scripts]
+kiskeleton = "src.main:main"
