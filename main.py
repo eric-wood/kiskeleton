@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from src.spreadsheet import Spreadsheet
+import src.logger
 
 
 def new(library_path, symbol_name, output_path):

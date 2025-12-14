@@ -1,7 +1,9 @@
+import logging
 import csv
 from copy import deepcopy
 from src.symbol import Symbol
 from src.library import Library
+import os.path
 
 symbol_cache: dict[str, Symbol] = dict()
 
@@ -32,6 +34,10 @@ class Spreadsheet:
                 writer.writerow({"name": symbol.name, **properties, **template})
 
     def read(self, path: str):
+        if not os.path.isfile(path):
+            logging.error("file not found %s", path)
+            return
+
         with open(path, "r") as file:
             reader = csv.DictReader(file)
             line = 0
@@ -94,7 +100,7 @@ def retrieve_symbol(library_path: str, symbol_name: str) -> Symbol | None:
         if symbol.name == symbol_name:
             return symbol
 
-    print(
+    logging.error(
         "Unable to locate symbol {} in library {}; skipping".format(
             symbol_name, library_path
         )
@@ -105,21 +111,18 @@ def validate_row(row: dict[str, str], path: str, line_number: int) -> bool:
     if "name" not in row:
         csv_error(
             message='Missing "name" column. Skipping.',
-            file=path,
             line_number=line_number,
         )
         return False
     if "template_library" not in row:
         csv_error(
             message='Missing "template_library" column. Skipping.',
-            file=path,
             line_number=line_number,
         )
         return False
     if "template_symbol_name" not in row:
         csv_error(
             message='Missing "template_symbol_name" column. Skipping.',
-            file=path,
             line_number=line_number,
         )
         return False
@@ -127,5 +130,5 @@ def validate_row(row: dict[str, str], path: str, line_number: int) -> bool:
     return True
 
 
-def csv_error(message: str, file: str, line_number: int):
-    print("\033[91mERROR\033[0m [{}:{}] {}".format(file, line_number, message))
+def csv_error(message: str, line_number: int):
+    logging.error("line {}: {}".format(line_number, message))
