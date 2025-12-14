@@ -62,7 +62,7 @@ it from a full existing library, or an existing symbol.
 This example uses the default resistor symbol as an input:
 
 ```sh
-uv run main.py new \
+kiskeleton new \
   --library /Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/Device.kicad_sym \
   --symbol R \
   --output my_cool_new_library.csv
@@ -78,7 +78,7 @@ You will now fill this out with all of your parts.
 With the spreadsheet filled out, it's time to generate the symbol library:
 
 ```sh
-uv run main.py generate \
+kiskeleton generate \
   --input my_cool_new_library.csv \
   --output my_cool_new_library.kicad_sym
 ```
