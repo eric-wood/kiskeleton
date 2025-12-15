@@ -63,6 +63,26 @@ def main():
             spreadsheet_path=args.input,
             output_path=args.output,
         )
+    else:
+        print("""
+  ____________ 
+ | Welcome to |
+ | KiSkeleton |   .-.
+  ‾‾‾‾‾‾‾‾‾‾‾\\|  (o.o)
+                  |=|
+                 __|__
+               //.=|=.\\
+              // .=|=. \\
+              \\ .=|=. //
+               \\(_=_)//
+                (:| |:)
+                 || ||
+                 () ()
+                 || ||
+                 || ||
+                ==' '==
+        """)
+        parser.print_help()
 
 
 if __name__ == "__main__":
