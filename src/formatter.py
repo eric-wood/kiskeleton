@@ -17,6 +17,7 @@ def _(obj, **kwds):
 BREAK_OPENER_SYMBOLS = (
     "symbol",
     "property",
+    "extends",
     "effects",
     "pin",
     "name",

@@ -81,6 +81,13 @@ class Symbol:
                 new_prop = SymbolProperty.default(name=prop, value=value)
                 self.properties[prop] = new_prop
 
+    def properties_dict(self) -> dict[str, str]:
+        result = {}
+        for key in self.properties:
+            result[key] = self.properties[key].value
+
+        return result
+
     def to_sexpr(self):
         symbols = [s.to_sexpr() for s in self.symbols]
         properties = [self.properties[p].to_sexpr() for p in self.properties]

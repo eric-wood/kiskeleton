@@ -40,6 +40,7 @@ class Spreadsheet:
             logging.error("file not found %s", path)
             return
 
+        self.symbol_names = set()
         with open(path, "r") as file:
             reader = csv.DictReader(file)
             line = 0
@@ -62,14 +63,19 @@ class Spreadsheet:
                     )
                     continue
 
-                self.templates[template_symbol_name] = template_symbol
+                cache_key = template_cache_key(
+                    template_symbol_library, template_symbol_name
+                )
+                self.templates[cache_key] = template_symbol
                 symbol = Symbol(
                     template_library=template_symbol_library,
                     template_name=template_symbol_name,
+                    properties=deepcopy(template_symbol.properties),
                 )
                 symbol.set_name(name)
                 symbol.merge_properties(row)
                 self.symbols.append(symbol)
+                self.symbol_names.add(symbol.name)
 
     @classmethod
     def from_library(cls, library_path: str) -> Self:
@@ -85,16 +91,46 @@ class Spreadsheet:
 
     def write_symbols(self, path: str):
         library = Library.new()
-        for template_name in self.templates:
-            template = self.templates[template_name]
-            template.extends = None
-            template.set_name("template_{}".format(template_name))
-            library.symbols.append(template)
+        library_templates = []
+        library_symbols = []
 
+        # directly map symbols to their templates so we can easily process the relationships
+        symbols_by_template: dict[str, list[Symbol]] = {}
         for symbol in self.symbols:
-            symbol.extends = "template_{}".format(symbol.template_name)
-            library.symbols.append(symbol)
+            cache_key = template_cache_key(
+                symbol.template_library, symbol.template_name
+            )
+            symbols = symbols_by_template.get(cache_key, [])
+            symbols.append(symbol)
+            symbols_by_template[cache_key] = symbols
 
+        for template_key in symbols_by_template:
+            template = self.templates[template_key]
+            template.extends = None
+            symbols = symbols_by_template[template_key]
+
+            if len(symbols) > 1:
+                # more than one symbol uses the template, so use derived symbols to define it
+                for symbol in symbols:
+                    symbol.extends = template.name
+                    if template.name == symbol.name:
+                        # this is an edge case from importing a symbol library that uses derived symbols;
+                        # the "root" symbol others are derived from ends up in the spreadsheet.
+                        # if the names match it's pretty safe to say we just want to extend it
+                        template.merge_properties(symbol.properties_dict())
+                    else:
+                        library_symbols.append(symbol)
+
+                library_templates.append(template)
+            else:
+                # only one symbol uses the template, so just clone/override it to avoid bloat
+                symbol = symbols[0]
+                new_symbol = deepcopy(template)
+                new_symbol.merge_properties(symbol)
+                library_symbols.append(symbol)
+
+        # kicad is picky about symbol order; if you extend a symbol, that symbol needs to be first in the file
+        library.symbols = [*library_templates, *library_symbols]
         library.to_file(path)
 
     def add_defaults(self, template_library=None, template_symbol_name=None):
@@ -111,7 +147,7 @@ class Spreadsheet:
 
 
 def get_symbol(library_path: str, symbol_name: str) -> Symbol | None:
-    cache_key = "{}-{}".format(library_path, symbol_name)
+    cache_key = template_cache_key(library_path, symbol_name)
     if cache_key in symbol_cache:
         return symbol_cache[cache_key]
 
@@ -159,6 +195,10 @@ def validate_row(row: dict[str, str], path: str, line_number: int) -> bool:
         return False
 
     return True
+
+
+def template_cache_key(library: str, name: str) -> str:
+    return "{}-{}".format(library, name)
 
 
 def csv_error(message: str, line_number: int):
