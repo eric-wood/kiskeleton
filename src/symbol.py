@@ -36,6 +36,7 @@ class SymbolProperty:
 @dataclass
 class Symbol:
     name: str = ""
+    extends: str | None = None
     manifest: list[SexprSymbol] = field(default_factory=lambda: [])
     properties: dict[str, SymbolProperty] = field(default_factory=lambda: {})
     symbols: list[Self] = field(default_factory=lambda: [])
@@ -50,13 +51,17 @@ class Symbol:
 
         for expr in props:
             token = expr[0]
-            if token == SexprSymbol("property"):
-                prop = SymbolProperty.from_sexpr(expr)
-                symbol.properties[prop.name] = prop
-            elif token == SexprSymbol("symbol"):
-                symbol.symbols.append(cls.from_sexpr(expr))
-            else:
-                symbol.manifest.append(expr)
+            match str(token):
+                case "property":
+                    prop = SymbolProperty.from_sexpr(expr)
+                    symbol.properties[prop.name] = prop
+                case "symbol":
+                    symbol.symbols.append(cls.from_sexpr(expr))
+                case "extends":
+                    symbol.extends = expr[1]
+                    symbol.template_name = symbol.extends
+                case _:
+                    symbol.manifest.append(expr)
 
         return symbol
 
@@ -79,4 +84,15 @@ class Symbol:
     def to_sexpr(self):
         symbols = [s.to_sexpr() for s in self.symbols]
         properties = [self.properties[p].to_sexpr() for p in self.properties]
-        return [SexprSymbol("symbol"), self.name, *self.manifest, *properties, *symbols]
+        extends = []
+        if self.extends is not None:
+            extends = [[SexprSymbol("extends"), self.extends]]
+
+        return [
+            SexprSymbol("symbol"),
+            self.name,
+            *extends,
+            *self.manifest,
+            *properties,
+            *symbols,
+        ]

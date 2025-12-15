@@ -11,6 +11,7 @@ symbol_cache: dict[str, Symbol] = dict()
 
 class Spreadsheet:
     symbols = []
+    templates = {}
 
     def write(self, path: str):
         field_names = ["name", "template_library", "template_symbol_name"]
@@ -55,9 +56,17 @@ class Spreadsheet:
                     template_symbol_library, template_symbol_name
                 )
                 if template_symbol is None:
+                    logging.warning(
+                        "Missing unable to locate template symbol for row %d, skipping",
+                        line,
+                    )
                     continue
 
-                symbol = deepcopy(template_symbol)
+                self.templates[template_symbol_name] = template_symbol
+                symbol = Symbol(
+                    template_library=template_symbol_library,
+                    template_name=template_symbol_name,
+                )
                 symbol.set_name(name)
                 symbol.merge_properties(row)
                 self.symbols.append(symbol)
@@ -69,13 +78,23 @@ class Spreadsheet:
         spreadsheet.symbols = library.symbols
         for symbol in spreadsheet.symbols:
             symbol.template_library = library_path
-            symbol.template_name = symbol.name
+            if symbol.extends is None:
+                symbol.template_name = symbol.name
 
         return spreadsheet
 
     def write_symbols(self, path: str):
         library = Library.new()
-        library.symbols = self.symbols
+        for template_name in self.templates:
+            template = self.templates[template_name]
+            template.extends = None
+            template.set_name("template_{}".format(template_name))
+            library.symbols.append(template)
+
+        for symbol in self.symbols:
+            symbol.extends = "template_{}".format(symbol.template_name)
+            library.symbols.append(symbol)
+
         library.to_file(path)
 
     def add_defaults(self, template_library=None, template_symbol_name=None):
