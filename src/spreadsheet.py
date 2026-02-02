@@ -126,7 +126,7 @@ class Spreadsheet:
                 # only one symbol uses the template, so just clone/override it to avoid bloat
                 symbol = symbols[0]
                 new_symbol = deepcopy(template)
-                new_symbol.merge_properties(symbol)
+                new_symbol.merge_properties(symbol.properties)
                 library_symbols.append(symbol)
 
         # kicad is picky about symbol order; if you extend a symbol, that symbol needs to be first in the file
