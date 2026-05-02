@@ -3,7 +3,7 @@ import logging
 from typing import Self
 from dataclasses import dataclass, field
 from src.symbol import Symbol
-from sexpdata import loads, dump, Symbol as SexprSymbol
+from sexpdata import loads, dump, dumps, Symbol as SexprSymbol
 
 
 @dataclass
@@ -46,6 +46,9 @@ class Library:
     def to_sexpr(self):
         symbols = [s.to_sexpr() for s in self.symbols]
         return [*self.manifest, *symbols]
+
+    def to_str(self) -> str:
+        return dumps(self.to_sexpr())
 
     def to_file(self, path: str):
         with open(path, "w") as file:

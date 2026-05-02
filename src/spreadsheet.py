@@ -89,7 +89,7 @@ class Spreadsheet:
 
         return spreadsheet
 
-    def write_symbols(self, path: str):
+    def to_library(self):
         library = Library.new()
         library_templates = []
         library_symbols = []
@@ -126,12 +126,15 @@ class Spreadsheet:
                 # only one symbol uses the template, so just clone/override it to avoid bloat
                 symbol = symbols[0]
                 new_symbol = deepcopy(template)
-                new_symbol.merge_properties(symbol.properties)
-                library_symbols.append(symbol)
+                new_symbol.merge_properties(symbol.properties_dict())
+                library_symbols.append(new_symbol)
 
         # kicad is picky about symbol order; if you extend a symbol, that symbol needs to be first in the file
         library.symbols = [*library_templates, *library_symbols]
-        library.to_file(path)
+        return library
+
+    def write_symbols(self, path: str):
+        self.to_library().to_file(path)
 
     def add_defaults(self, template_library=None, template_symbol_name=None):
         if template_library is None or template_symbol_name is None:
