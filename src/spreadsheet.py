@@ -26,7 +26,7 @@ class Spreadsheet:
         # dedupe while preserving order
         field_names = list(dict.fromkeys(field_names))
 
-        with open(path, "w") as file:
+        with open(path, "w", newline="") as file:
             writer = csv.DictWriter(file, fieldnames=field_names)
             writer.writeheader()
             for symbol in self.symbols:
