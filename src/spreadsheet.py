@@ -2,11 +2,15 @@ import logging
 import csv
 from copy import deepcopy
 from src.symbol import Symbol
-from src.library import Library
+from src.library import Library, LibraryNotFoundException
 import os.path
 from typing import Self
 
 symbol_cache: dict[str, Symbol] = dict()
+
+
+class LibrarySymbolNotFoundException(Exception):
+    pass
 
 
 class Spreadsheet:
@@ -48,6 +52,11 @@ class Spreadsheet:
 
             for row in reader:
                 line += 1
+
+                # ignore blank lines
+                if not [True for v in row.values() if v.strip()]:
+                    continue
+
                 if not validate_row(row=row, path=path, line_number=line):
                     continue
 
@@ -55,9 +64,21 @@ class Spreadsheet:
                 template_symbol_library = row.pop("template_library")
                 template_symbol_name = row.pop("template_symbol_name")
 
-                template_symbol = get_symbol(
-                    template_symbol_library, template_symbol_name
-                )
+                template_symbol = None
+                try:
+                    template_symbol = get_symbol(
+                        template_symbol_library, template_symbol_name
+                    )
+                except LibraryNotFoundException:
+                    logging.error(
+                        f"[row {line}] unable to locate template library at {template_symbol_library}, skipping"
+                    )
+                    continue
+                except LibrarySymbolNotFoundException:
+                    logging.error(
+                        f"[row {line}] unable to locate symbol {template_symbol_name} in library at {template_symbol_library}, skipping"
+                    )
+                    continue
                 if template_symbol is None:
                     logging.warning(
                         "Missing unable to locate template symbol for row %d, skipping",
@@ -172,10 +193,8 @@ def retrieve_symbol(library_path: str, symbol_name: str) -> Symbol | None:
         if symbol.name == symbol_name:
             return symbol
 
-    logging.error(
-        "Unable to locate symbol {} in library {}; skipping".format(
-            symbol_name, library_path
-        )
+    raise LibraryNotFoundException(
+        "Unable to locate symbol {} in library {}".format(symbol_name, library_path)
     )
 
 

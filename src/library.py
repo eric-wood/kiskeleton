@@ -6,6 +6,10 @@ from src.symbol import Symbol
 from sexpdata import loads, dump, dumps, Symbol as SexprSymbol
 
 
+class LibraryNotFoundException(Exception):
+    pass
+
+
 @dataclass
 class Library:
     manifest: list[SexprSymbol] = field(default_factory=lambda: [])
@@ -38,7 +42,7 @@ class Library:
     @classmethod
     def from_file(cls, path: str) -> Self:
         if not os.path.isfile(path):
-            logging.error("library not found %s", path)
+            raise LibraryNotFoundException(f"Unable to locate library at: {path}")
 
         with open(path) as file:
             return cls.from_str(file.read())

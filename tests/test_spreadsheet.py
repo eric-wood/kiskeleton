@@ -30,3 +30,12 @@ class TestSpreadsheet(unittest.TestCase, SnapshotAssertions):
         spreadsheet.read(input_path)
         result = spreadsheet.to_library().to_str()
         self.assertMatchesSnapshot("tests/fixtures/multiple_result.kicad_sym", result)
+
+    def test_blank_lines(self):
+        input_path = "tests/fixtures/blank_lines.csv"
+        spreadsheet = Spreadsheet()
+        spreadsheet.read(input_path)
+        result = spreadsheet.to_library().to_str()
+        self.assertMatchesSnapshot(
+            "tests/fixtures/blank_lines_result.kicad_sym", result
+        )
