@@ -10,8 +10,9 @@ symbol_cache: dict[str, Symbol] = dict()
 
 
 class Spreadsheet:
-    symbols = []
-    templates = {}
+    def __init__(self):
+        self.symbols = []
+        self.templates = {}
 
     def write(self, path: str):
         field_names = ["name", "template_library", "template_symbol_name"]
@@ -44,6 +45,7 @@ class Spreadsheet:
         with open(path, "r") as file:
             reader = csv.DictReader(file)
             line = 0
+
             for row in reader:
                 line += 1
                 if not validate_row(row=row, path=path, line_number=line):
